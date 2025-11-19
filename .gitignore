@@ -1,0 +1,69 @@
+# .gitignore for a typical React + .NET + Docker project
+# Node
+node_modules/
+build/
+dist/
+.env
+.env.*
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Dependency directories
+jspm_packages/
+
+# VSCode
+.vscode/
+
+# .NET
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# PostgreSQL
+*.pgsql
+*.psql
+*.db
+*.sql
+pgdata/
+postgres-data/
+postgres/
+*.dump
+*.backup
+pgadmin/
+pg_logs/
+pg_log/
+pgdata/
+*.pid
+*.conf
+*.log
+
+# Docker
+*.local
+*.dockerignore
+Dockerfile*
+!Dockerfile
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Others
+coverage/
+*.tgz
+.idea/
+*.iml
+*.swp
+
+# Ignore Azure Pipelines artifacts
+*.azure-pipelines.yml
+
+# Ignore test output
+TestResults/

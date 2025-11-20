@@ -1,7 +1,7 @@
 
 namespace AuctionService.DTOs;
 
-public class AuctionCreatedDto
+public class CreateAuctionDto
 {
     public Guid Id { get; set; }
 

@@ -1,5 +1,5 @@
 
-namespace Contracts.Auctions;
+namespace Contracts;
 
 public class AuctionUpdated
 {

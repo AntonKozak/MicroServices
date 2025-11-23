@@ -11,23 +11,23 @@ public class CreateAuctionDto
 
     public DateTime AuctionEnd { get; set; }
 
-    public string Seller { get; set; } = null!;
+    public string Seller { get; set; } = string.Empty;
 
     public string? Winner { get; set; }
 
-    public string Make { get; set; } = null!;
+    public string Make { get; set; } = string.Empty;
 
-    public string Model { get; set; } = null!;
+    public string Model { get; set; } = string.Empty;
 
     public int Year { get; set; }
 
-    public string Color { get; set; } = null!;
+    public string Color { get; set; } = string.Empty;
 
     public int Mileage { get; set; }
 
-    public string ImageUrl { get; set; } = null!;
+    public string ImageUrl { get; set; } = string.Empty;
 
-    public string Status { get; set; } = null!;
+    public string Status { get; set; } = string.Empty;
 
     public int ReservePrice { get; set; }
 

@@ -1,6 +1,220 @@
-@IdentityService_HostAddress = http://localhost:5249
+### Identity Service API Tests
 
-GET {{IdentityService_HostAddress}}/weatherforecast/
-Accept: application/json
+@baseUrl = http://localhost:5001
+@token =
+@userId =
 
-###
+### Health Check
+GET {{baseUrl}}/swagger/index.html
+
+### ============================================
+### Registration & Email Confirmation
+### ============================================
+
+### Register a new user
+# @name register
+POST {{baseUrl}}/api/account/register
+Content-Type: application/json
+
+{
+  "email": "testuser@example.com",
+  "userName": "testuser",
+  "password": "Test123!",
+  "firstName": "Test",
+  "lastName": "User"
+}
+
+### Extract userId
+@userId = {{register.response.body.userId}}
+
+### Confirm email (use token from console output)
+GET {{baseUrl}}/api/account/confirm-email?userId={{userId}}&token=YOUR_TOKEN_FROM_CONSOLE
+
+### Resend confirmation email
+POST {{baseUrl}}/api/account/resend-confirmation-email
+Content-Type: application/json
+
+"testuser@example.com"
+
+### ============================================
+### Login & Authentication
+### ============================================
+
+### Login with Bob (seeded user)
+# @name loginBob
+POST {{baseUrl}}/api/account/login
+Content-Type: application/json
+
+{
+  "userName": "bob",
+  "password": "Pass123$"
+}
+
+### Login with Tom (seeded user)
+# @name loginTom
+POST {{baseUrl}}/api/account/login
+Content-Type: application/json
+
+{
+  "userName": "tom",
+  "password": "Pass123$"
+}
+
+### Login with Alice (seeded user)
+# @name loginAlice
+POST {{baseUrl}}/api/account/login
+Content-Type: application/json
+
+{
+  "userName": "alice",
+  "password": "Pass123$"
+}
+
+### Login with test user
+# @name login
+POST {{baseUrl}}/api/account/login
+Content-Type: application/json
+
+{
+  "userName": "testuser",
+  "password": "Test123!"
+}
+
+### Extract token from login response
+@token = {{login.response.body.token}}
+@refreshToken = {{login.response.body.refreshToken}}
+
+### Refresh token
+# @name refresh
+POST {{baseUrl}}/api/account/refresh-token
+Content-Type: application/json
+
+{
+  "token": "{{token}}",
+  "refreshToken": "{{refreshToken}}"
+}
+
+### ============================================
+### User Profile Management
+### ============================================
+
+### Get current user (requires authentication)
+GET {{baseUrl}}/api/account/me
+Authorization: Bearer {{token}}
+
+### Update profile
+PUT {{baseUrl}}/api/account/update-profile
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "firstName": "Updated",
+  "lastName": "Name",
+  "phoneNumber": "+1234567890"
+}
+
+### ============================================
+### Password Management
+### ============================================
+
+### Change password (requires authentication)
+POST {{baseUrl}}/api/account/change-password
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "currentPassword": "Test123!",
+  "newPassword": "NewPassword123!",
+  "confirmPassword": "NewPassword123!"
+}
+
+### Forgot password
+POST {{baseUrl}}/api/account/forgot-password
+Content-Type: application/json
+
+{
+  "email": "testuser@example.com"
+}
+
+### Reset password (use token from email/console)
+POST {{baseUrl}}/api/account/reset-password
+Content-Type: application/json
+
+{
+  "email": "testuser@example.com",
+  "token": "YOUR_RESET_TOKEN",
+  "newPassword": "ResetPassword123!",
+  "confirmPassword": "ResetPassword123!"
+}
+
+### ============================================
+### Logout & Account Deletion
+### ============================================
+
+### Logout
+POST {{baseUrl}}/api/account/logout
+Authorization: Bearer {{token}}
+
+### Delete account (requires authentication)
+DELETE {{baseUrl}}/api/account/delete-account
+Authorization: Bearer {{token}}
+
+### ============================================
+### Admin Endpoints (requires Admin role)
+### ============================================
+
+### Login as admin (seeded user)
+# @name adminLogin
+POST {{baseUrl}}/api/account/login
+Content-Type: application/json
+
+{
+  "userName": "admin",
+  "password": "Pass123$"
+}
+
+### Extract admin token
+@adminToken = {{adminLogin.response.body.token}}
+
+### Get all users (Admin only)
+GET {{baseUrl}}/api/admin/users
+Authorization: Bearer {{adminToken}}
+
+### Get specific user (Admin only)
+GET {{baseUrl}}/api/admin/users/{{userId}}
+Authorization: Bearer {{adminToken}}
+
+### Get all roles (Admin only)
+GET {{baseUrl}}/api/admin/roles
+Authorization: Bearer {{adminToken}}
+
+### Create a new role (Admin only)
+POST {{baseUrl}}/api/admin/roles
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+"Moderator"
+
+### Add user to role (Admin only)
+POST {{baseUrl}}/api/admin/users/{{userId}}/roles/Seller
+Authorization: Bearer {{adminToken}}
+
+### Remove user from role (Admin only)
+DELETE {{baseUrl}}/api/admin/users/{{userId}}/roles/Seller
+Authorization: Bearer {{adminToken}}
+
+### ============================================
+### Additional Test Users
+### ============================================
+
+### Register seller user
+POST {{baseUrl}}/api/account/register
+Content-Type: application/json
+
+{
+  "email": "seller@example.com",
+  "userName": "seller",
+  "password": "Seller123!",
+  "firstName": "Seller",
+  "lastName": "Account"
+}

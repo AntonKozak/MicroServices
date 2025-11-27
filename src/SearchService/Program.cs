@@ -10,6 +10,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddHttpClient<AuctionServiceHttpClient>().AddPolicyHandler(GetPolicy());
 
+builder.Services.AddHealthChecks();
+
 // Add Swagger services
 builder.Services.AddSwaggerGen(c =>
 {
@@ -20,12 +22,18 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.AddMassTransit(x =>
 {
-    x.AddConsumer<AuctionCreatedConsumer>();
+    x.AddConsumersFromNamespaceContaining<AuctionCreatedConsumer>();
 
     x.SetEndpointNameFormatter(new KebabCaseEndpointNameFormatter("search-service", false));
 
     x.UsingRabbitMq((context, cfg) =>
     {
+        cfg.Host(builder.Configuration["RabbitMq:Host"] ?? "localhost", "/", h =>
+        {
+            h.Username(builder.Configuration.GetValue("RabbitMq:Username", "guest")!);
+            h.Password(builder.Configuration.GetValue("RabbitMq:Password", "guest")!);
+        });
+
         cfg.ReceiveEndpoint("search-auction-created", e =>
         {
             e.UseMessageRetry(r => r.Interval(3, TimeSpan.FromSeconds(5)));
@@ -45,6 +53,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.MapControllers();
+app.MapHealthChecks("/health");
 
 app.Lifetime.ApplicationStarted.Register(async () =>
 {

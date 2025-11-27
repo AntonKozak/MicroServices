@@ -2,6 +2,31 @@
 
 This repository contains a sample microservices system used for learning. The architecture follows a microservices pattern with dedicated services for identity, auctions, bidding, search, notifications, and a gateway. Services communicate asynchronously through RabbitMQ.
 
+┌─────────────────────────────────────────────────┐
+│            Gateway Service :6001                │
+│         (YARP Reverse Proxy + JWT)              │
+└─────────────┬───────────────────────────────────┘
+              │
+      ┌───────┴────────┬──────────────┐
+      ▼                ▼              ▼
+┌──────────┐    ┌──────────┐   ┌──────────┐
+│ Auction  │    │  Search  │   │ Identity │
+│  :7001   │◄──►│  :7002   │   │  :5001   │
+└────┬─────┘    └────┬─────┘   └────┬─────┘
+     │               │              │
+     ▼               ▼              ▼
+┌──────────┐    ┌──────────┐   ┌──────────┐
+│Postgres  │    │ MongoDB  │   │Postgres  │
+│  :5432   │    │  :27017  │   │  :5432   │
+└──────────┘    └──────────┘   └──────────┘
+     │               │
+     └───────┬───────┘
+             ▼
+      ┌──────────┐
+      │ RabbitMQ │
+      │  :5672   │
+      └──────────┘
+
 ## Contents
 
 - `frontend/` — Optional frontend app for consuming the microservices.

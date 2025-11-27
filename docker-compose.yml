@@ -126,7 +126,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:7003
       - RabbitMq__Host=rabbitmq
-      - ConnectionStrings__MongoDbConnection=mongodb://root:mongopw@mongodb
+      - ConnectionStrings__BidDbConnection=mongodb://root:mongopw@mongodb
       - JwtSettings__Secret=${JWT_SECRET}
       - JwtSettings__Issuer=${JWT_ISSUER}
       - JwtSettings__Audience=${JWT_AUDIENCE}

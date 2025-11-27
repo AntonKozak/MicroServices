@@ -15,7 +15,7 @@ public class BidPlacedConsumer : IConsumer<BidPlaced>
     public async Task Consume(ConsumeContext<BidPlaced> context)
     {
         Console.WriteLine("BidPlacedConsumer reached - - - - - > > > > BidPlaceConsumer");
-        var auction = await _dbContext.Auctions.FindAsync(context.Message.AuctionId);
+        var auction = await _dbContext.Auctions.FindAsync(Guid.Parse(context.Message.AuctionId));
 
         if (auction == null)
         {

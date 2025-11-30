@@ -27,6 +27,45 @@ This repository contains a sample microservices system used for learning. The ar
       │  :5672   │
       └──────────┘
 
+
+┌─────────────────────────────────────────────────┐
+│            Production Environment                │
+└─────────────────────────────────────────────────┘
+                     │
+         ┌───────────┴───────────┐
+         │                       │
+    ┌────▼────┐           ┌─────▼─────┐
+    │ Health  │           │ Synthetic │
+    │ Checks  │           │   Tests   │
+    └────┬────┘           └─────┬─────┘
+         │                      │
+         └──────────┬───────────┘
+                    │
+         ┌──────────▼──────────┐
+         │   Metrics & Logs    │
+         │                     │
+         │  • Prometheus       │
+         │  • Serilog/Seq      │
+         │  • Jaeger Tracing   │
+         └──────────┬──────────┘
+                    │
+         ┌──────────▼──────────┐
+         │   Visualization     │
+         │                     │
+         │  • Grafana          │
+         │  • Jaeger UI        │
+         │  • Seq UI           │
+         └──────────┬──────────┘
+                    │
+         ┌──────────▼──────────┐
+         │     Alerting        │
+         │                     │
+         │  • Slack            │
+         │  • Email            │
+         │  • PagerDuty        │
+         └─────────────────────┘
+
+
 ## Contents
 
 - `frontend/` — Optional frontend app for consuming the microservices.

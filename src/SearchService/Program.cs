@@ -22,7 +22,10 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.AddMassTransit(x =>
 {
-    x.AddConsumersFromNamespaceContaining<AuctionCreatedConsumer>();
+    x.AddConsumer<AuctionCreatedConsumer>();
+    x.AddConsumer<BidPlacedConsumer>();
+    x.AddConsumer<AuctionUpdatedConsumer>();
+    x.AddConsumer<AuctionDeletedConsumer>();
 
     x.SetEndpointNameFormatter(new KebabCaseEndpointNameFormatter("search-service", false));
 

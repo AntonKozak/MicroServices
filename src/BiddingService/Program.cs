@@ -52,7 +52,7 @@ builder.Services.AddMassTransit(x =>
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddHostedService<CheckAuctionFinished>();
 builder.Services.AddHealthChecks();
-
+builder.Services.AddScoped<GrpcAuctionClient>();
 
 var app = builder.Build();
 

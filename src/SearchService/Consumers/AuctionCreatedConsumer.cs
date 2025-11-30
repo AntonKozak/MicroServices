@@ -1,5 +1,5 @@
 using AutoMapper;
-using Contracts;
+using Contracts.Auctions;
 using MassTransit;
 using MongoDB.Entities;
 using SearchService.Models;
@@ -9,6 +9,7 @@ namespace SearchService.Consumers;
 public class AuctionCreatedConsumer : IConsumer<AuctionCreated>
 {
     private readonly IMapper _mapper;
+
     public AuctionCreatedConsumer(IMapper mapper)
     {
         _mapper = mapper;
@@ -27,5 +28,7 @@ public class AuctionCreatedConsumer : IConsumer<AuctionCreated>
         }
 
         await item.SaveAsync();
+
+        Console.WriteLine("✅ Add auction to DB !");
     }
 }

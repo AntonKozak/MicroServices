@@ -45,25 +45,32 @@ public class BidsController : ControllerBase
             return BadRequest("Sellers cannot bid on their own auctions.");
         }
 
-        // Check if auction has ended
         if (auction.AuctionEnd < DateTime.UtcNow)
         {
             return BadRequest("Auction has ended.");
         }
 
-        // Get highest bid
+        // Отримуємо список попередніх учасників
+        var previousBidders = await DB.Find<Bid>()
+            .Match(b => b.AuctionId == auctionId)
+            .ExecuteAsync();
+
+        var uniquePreviousBidders = previousBidders
+            .Select(b => b.Bidder)
+            .Distinct()
+            .Where(b => b != User.Identity?.Name)
+            .ToList();
+
         var highestBid = await DB.Find<Bid>()
             .Match(b => b.AuctionId == auctionId)
             .Sort(b => b.Descending(x => x.Amount))
             .ExecuteFirstAsync();
 
-        // Bid must be higher than current highest bid
         if (highestBid != null && amount <= highestBid.Amount)
         {
             return BadRequest($"Bid must be higher than current highest bid of {highestBid.Amount}");
         }
 
-        // Create bid
         var bid = new Bid
         {
             AuctionId = auctionId,
@@ -71,7 +78,6 @@ public class BidsController : ControllerBase
             Amount = amount,
         };
 
-        // Determine bid status
         if (amount >= auction.ReservePrice)
         {
             bid.BidStatus = BidStatus.Accepted;
@@ -82,13 +88,16 @@ public class BidsController : ControllerBase
         }
 
         await bid.SaveAsync();
-        _publishEndpoint.Publish(_mapper.Map<BidPlaced>(bid));
+
+        var bidPlacedEvent = _mapper.Map<BidPlaced>(bid);
+        bidPlacedEvent.PreviousBidders = uniquePreviousBidders;
+
+        await _publishEndpoint.Publish(bidPlacedEvent);
 
         return Ok(_mapper.Map<BidDto>(bid));
     }
 
     [HttpGet("{auctionId}")]
-
     public async Task<ActionResult<List<BidDto>>> GetBidsForAuction(string auctionId)
     {
         var bids = await DB.Find<Bid>()
@@ -96,5 +105,20 @@ public class BidsController : ControllerBase
             .Sort(b => b.Descending(x => x.BidTime))
             .ExecuteAsync();
         return bids.Select(_mapper.Map<BidDto>).ToList();
+    }
+
+    [HttpGet("{auctionId}/bidders")]
+    public async Task<ActionResult<List<string>>> GetBiddersForAuction(string auctionId)
+    {
+        var bids = await DB.Find<Bid>()
+            .Match(b => b.AuctionId == auctionId)
+            .ExecuteAsync();
+
+        var uniqueBidders = bids
+            .Select(b => b.Bidder)
+            .Distinct()
+            .ToList();
+
+        return uniqueBidders;
     }
 }

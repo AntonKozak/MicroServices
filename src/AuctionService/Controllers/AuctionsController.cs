@@ -3,6 +3,7 @@ using AuctionService.DTOs;
 using AuctionService.Entities;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Contracts.Auctions;
 using MassTransit;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -68,7 +69,7 @@ public class AuctionsController : ControllerBase
 
         // Publish event to event bus
         var newAuction = _mapper.Map<AuctionDto>(auction);
-        await _publishEndpoint.Publish(_mapper.Map<Contracts.AuctionCreated>(newAuction));
+        await _publishEndpoint.Publish(_mapper.Map<AuctionCreated>(newAuction));
 
 
         var result = await _context.SaveChangesAsync() > 0;
@@ -100,7 +101,7 @@ public class AuctionsController : ControllerBase
         auction.Item.Year = updateAuctionDto.Year != 0 ? updateAuctionDto.Year : auction.Item.Year;
         auction.UpdatedAt = DateTime.UtcNow;
 
-        await _publishEndpoint.Publish(_mapper.Map<Contracts.AuctionUpdated>(auction));
+        await _publishEndpoint.Publish(_mapper.Map<AuctionUpdated>(auction));
 
         var result = await _context.SaveChangesAsync() > 0;
 
@@ -126,7 +127,7 @@ public class AuctionsController : ControllerBase
 
         _context.Auctions.Remove(auction);
 
-        await _publishEndpoint.Publish<Contracts.AuctionDeleted>(new { Id = auction.Id.ToString() });
+        await _publishEndpoint.Publish<AuctionDeleted>(new { Id = auction.Id.ToString() });
 
         var result = await _context.SaveChangesAsync() > 0;
 

@@ -1,12 +1,12 @@
 using AutoMapper;
-using Contracts;
+using Contracts.Auctions;
 using MassTransit;
 using MongoDB.Entities;
 using SearchService.Models;
 
 namespace SearchService.Consumers;
 
-public class AuctionUpdatedConsumer : IConsumer<Contracts.AuctionUpdated>
+public class AuctionUpdatedConsumer : IConsumer<AuctionUpdated>
 {
     private readonly IMapper _mapper;
     public AuctionUpdatedConsumer(IMapper mapper)

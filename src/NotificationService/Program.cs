@@ -1,9 +1,15 @@
 using MassTransit;
+using NotificationService.Consumers;
+using NotificationService.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddSignalR();
+
 builder.Services.AddMassTransit(x =>
 {
+    x.AddConsumer<AuctionCreatedConsumer>();
+    x.AddConsumer<BidPlacedConsumer>();
 
     x.SetEndpointNameFormatter(new KebabCaseEndpointNameFormatter("notifications", false));
 
@@ -23,6 +29,7 @@ builder.Services.AddHealthChecks();
 
 var app = builder.Build();
 
+app.MapHub<NotificationHub>("/notifications");
 app.MapHealthChecks("/health");
 
 app.Run();

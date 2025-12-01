@@ -38,14 +38,30 @@ builder.Services.AddAuthorization(options =>
     });
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("customPolicy", opt =>
+    {
+        opt.AllowAnyHeader()
+           .AllowAnyMethod()
+           .AllowCredentials()
+           .WithOrigins(builder.Configuration["ClientApp"] ?? "http://localhost:3000");
+    });
+});
+
+
+
 builder.Services.AddHealthChecks();
 
 var app = builder.Build();
 
+app.UseCors("customPolicy");
+
+app.MapReverseProxy();
+app.MapHealthChecks("/health");
+
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapHealthChecks("/health");
-app.MapReverseProxy();
 
 app.Run();

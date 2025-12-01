@@ -1,11 +1,11 @@
-using Contracts;
+using Contracts.Auctions;
 using MassTransit;
 using MongoDB.Entities;
 using SearchService.Models;
 
 namespace SearchService.Consumers;
 
-public class AuctionDeletedConsumer : IConsumer<Contracts.AuctionDeleted>
+public class AuctionDeletedConsumer : IConsumer<AuctionDeleted>
 {
     public async Task Consume(ConsumeContext<AuctionDeleted> context)
     {

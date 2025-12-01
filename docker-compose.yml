@@ -143,8 +143,34 @@ services:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
+      auction-svc:
+        condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:7003/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+
+  notification-svc:
+    image: notificationservice
+    build:
+      context: .
+      dockerfile: src/NotificationService/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:7004
+      - RabbitMq__Host=rabbitmq
+      - JwtSettings__Secret=${JWT_SECRET}
+      - JwtSettings__Issuer=${JWT_ISSUER}
+      - JwtSettings__Audience=${JWT_AUDIENCE}
+    ports:
+      - "7004:7004"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7004/health"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -171,6 +197,8 @@ services:
       identity-svc:
         condition: service_healthy
       bidding-svc:
+        condition: service_healthy
+      notification-svc:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:6001/health"]

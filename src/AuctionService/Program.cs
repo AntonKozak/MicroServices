@@ -1,6 +1,8 @@
 using System.Text;
 using AuctionService.Consumers;
 using AuctionService.Data;
+using AuctionService.Interfaces;
+using AuctionService.Repository;
 using AuctionService.Services;
 using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -13,6 +15,8 @@ builder.Services.AddControllers();
 
 builder.Services.AddDbContext<AuctionDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("AuctionDatabase")));
+
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 builder.Services.AddHealthChecks()
     .AddNpgSql(builder.Configuration.GetConnectionString("AuctionDatabase")!);
@@ -81,8 +85,11 @@ try
 {
     DBInitializer.InitializeDb(app);
 }
-catch (System.Exception e)
+catch (Exception e)
 {
     Console.WriteLine("An error occurred while migrating or initializing the database.", e.Message);
 }
 app.Run();
+
+// Make the implicit Program class public for integration testing
+public partial class Program { }
